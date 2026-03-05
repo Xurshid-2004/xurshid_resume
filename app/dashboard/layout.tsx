@@ -114,9 +114,101 @@ const InnerLayout = ({ children }: { children: ReactNode }) => {
     reader.readAsDataURL(file);
   };
 
-  const handlePDF = useCallback(() => {
-    if (typeof window !== "undefined") window.print();
-  }, []);
+  const handlePDF = useCallback(async () => {
+    if (typeof window === "undefined") return;
+    
+    // Check if mobile device - more comprehensive detection
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                     window.innerWidth <= 768;
+    
+    if (isMobile) {
+      // For mobile devices, use html2canvas + jsPDF
+      try {
+        const html2canvas = (await import('html2canvas')).default;
+        const { jsPDF } = await import('jspdf');
+        
+        const element = document.getElementById('resume-print');
+        if (!element) {
+          alert('Resume element not found');
+          return;
+        }
+        
+        // Show loading state - properly type the button
+        const downloadButtons = Array.from(document.querySelectorAll('button')).filter(btn => 
+          btn.textContent?.includes('Download PDF') || btn.textContent?.includes('PDF Yuklab Olish') || btn.textContent?.includes('Скачать PDF')
+        );
+        
+        downloadButtons.forEach(button => {
+          if (button instanceof HTMLButtonElement) {
+            button.textContent = 'Generating PDF...';
+            button.disabled = true;
+          }
+        });
+        
+        // Create canvas from the resume element
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          width: element.scrollWidth,
+          height: element.scrollHeight
+        });
+        
+        // Create PDF
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        
+        // Download the PDF
+        const fileName = `${data.fullName || 'resume'}_${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(fileName);
+        
+        // Restore buttons
+        downloadButtons.forEach(button => {
+          if (button instanceof HTMLButtonElement) {
+            button.textContent = '📄 ' + t.download;
+            button.disabled = false;
+          }
+        });
+        
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+        
+        // Restore buttons
+        const downloadButtons = Array.from(document.querySelectorAll('button')).filter(btn => 
+          btn.textContent?.includes('Generating PDF')
+        );
+        
+        downloadButtons.forEach(button => {
+          if (button instanceof HTMLButtonElement) {
+            button.textContent = '📄 ' + t.download;
+            button.disabled = false;
+          }
+        });
+      }
+    } else {
+      // For desktop, use the original print method
+      window.print();
+    }
+  }, [data.fullName, t.download]);
 
   // Section tags for cards
   const expTags = data.experiences?.map((e) => e.company) || [];

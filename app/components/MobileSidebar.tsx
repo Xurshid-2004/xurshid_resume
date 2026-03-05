@@ -60,25 +60,15 @@ const MobileSidebar = ({
       {/* Sidebar Content */}
       <div className="relative w-80 bg-slate-900 flex flex-col overflow-y-auto p-5 shadow-2xl">
         {/* Close Button */}
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="absolute top-4 right-4 text-slate-300 hover:text-white font-bold text-xl"
-        >
-          ✕
-        </button>
+       
 
         {/* Logo + Title */}
-        <Link href="/">
-          <button className="w-full h-9 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 rounded-xl text-sm font-bold text-slate-300 border border-slate-700 mb-4">
-            {t.backToTemplates}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="px-2 py-1 bg-slate-700 rounded-lg text-sm font-bold text-slate-300"
+          >
+            Yopish
           </button>
-        </Link>
-        <h2 className="text-xl font-black bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent">
-          {t.createResume}
-        </h2>
-        <p className="text-slate-500 text-[10px] uppercase tracking-widest mt-0.5">
-          {t.enterInfo}
-        </p>
 
         {/* Sidebar Content */}
         <SidebarContent
