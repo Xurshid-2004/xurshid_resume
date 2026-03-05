@@ -68,17 +68,17 @@ export default function ShablonPage() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto  sm:px-6 lg:px-8 ">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-6 sm:mb-8 lg:mb-14">
            
-          <p className="text-slate-400 text-lg mt-4 max-w-xl mx-auto">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-lg mt-2 sm:mt-4 max-w-xl mx-auto px-4">
             Professional rezyumengiz uchun eng mos dizaynni tanlang va bir necha daqiqada tayyor qiling.
           </p>
         </div>
 
         {/* Template Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2 xl:grid-cols-3">
           {TEMPLATES.map((tpl) => (
             <div
               key={tpl.id}
@@ -124,17 +124,17 @@ export default function ShablonPage() {
               </div>
 
               {/* Info */}
-              <div className="p-5">
+              <div className="p-4 sm:p-5">
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <h3 className="text-base font-black text-white">{tpl.title}</h3>
+                    <h3 className="text-sm sm:text-base font-black text-white">{tpl.title}</h3>
                     <p className="text-xs text-slate-400 mt-0.5">{tpl.description}</p>
                   </div>
                   <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${tpl.color} mt-1.5 shrink-0`} />
                 </div>
 
                 <button
-                  className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95
+                  className={`w-full py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 active:scale-95
                     ${selected === tpl.id
                       ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
                       : `bg-gradient-to-r ${tpl.color} text-white opacity-80 group-hover:opacity-100`
@@ -148,11 +148,11 @@ export default function ShablonPage() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-12">
-          <p className="text-slate-500 text-sm">
+        <div className="text-center mt-6 sm:mt-8 lg:mt-12">
+          <p className="text-slate-400 text-xs sm:text-sm px-4">
             Shablon tanlangandan so'ng ma'lumotlaringizni kiritib, PDF shaklida yuklab olasiz
           </p>
-          <Link href="/dashboard" className="inline-flex items-center gap-2 mt-4 text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition-colors">
+          <Link href="/dashboard" className="inline-flex items-center gap-2 mt-3 sm:mt-4 text-emerald-400 hover:text-emerald-300 text-xs sm:text-sm font-semibold transition-colors">
             Ma'lumotlarni kiritishga o'tish →
           </Link>
         </div>

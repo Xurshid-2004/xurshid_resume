@@ -20,6 +20,7 @@ export default function Template3() {
 
   return (
     <div
+      id="resume-print"
       className="w-[210mm] min-h-[297mm] bg-white mx-auto flex overflow-hidden shadow-2xl"
       style={{ fontFamily: "'Georgia', serif" }}
     >
