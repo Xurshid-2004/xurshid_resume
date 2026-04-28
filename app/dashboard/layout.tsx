@@ -137,6 +137,54 @@ const InnerLayout = ({ children }: { children: ReactNode }) => {
       shell.style.transformOrigin = "top left";
     }
 
+    // Convert modern CSS color functions (lab/oklch/oklab/lch/color()) into rgb so
+    // html2canvas-pro can parse them. Next.js production CSS optimizer emits lab(),
+    // which works in the browser but breaks html2canvas. Dev mode skips this transform,
+    // which is why PDF export works locally but fails on Vercel.
+    const probeCtx = document.createElement("canvas").getContext("2d");
+    const cssProps = [
+      "color",
+      "background-color",
+      "border-top-color",
+      "border-right-color",
+      "border-bottom-color",
+      "border-left-color",
+      "outline-color",
+      "text-decoration-color",
+      "fill",
+      "stroke",
+    ];
+    const restoreColorFns: Array<() => void> = [];
+    const toRgb = (val: string): string | null => {
+      if (!val || !probeCtx) return null;
+      if (!/lab\(|oklab\(|oklch\(|lch\(|color\(/i.test(val)) return null;
+      try {
+        probeCtx.fillStyle = "#000";
+        probeCtx.fillStyle = val;
+        const out = probeCtx.fillStyle as string;
+        return typeof out === "string" ? out : null;
+      } catch {
+        return null;
+      }
+    };
+    const allEls: HTMLElement[] = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
+    allEls.forEach((el) => {
+      const cs = getComputedStyle(el);
+      cssProps.forEach((prop) => {
+        const v = cs.getPropertyValue(prop);
+        const rgb = toRgb(v);
+        if (rgb && rgb !== v) {
+          const prevValue = el.style.getPropertyValue(prop);
+          const prevPriority = el.style.getPropertyPriority(prop);
+          el.style.setProperty(prop, rgb, "important");
+          restoreColorFns.push(() => {
+            if (prevValue) el.style.setProperty(prop, prevValue, prevPriority);
+            else el.style.removeProperty(prop);
+          });
+        }
+      });
+    });
+
     // Wait for the browser to repaint without the transform
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
@@ -156,6 +204,8 @@ const InnerLayout = ({ children }: { children: ReactNode }) => {
       });
       return canvas;
     } finally {
+      // Restore overridden colors
+      restoreColorFns.forEach((fn) => fn());
       // Restore the scale transform
       if (shell instanceof HTMLElement) {
         shell.style.transform = savedTransform;
